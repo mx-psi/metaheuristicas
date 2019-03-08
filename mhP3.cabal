@@ -1,0 +1,37 @@
+name:                mhP3
+version:             0.1.0.0
+homepage:
+license:             GPL-3
+license-file:        LICENSE
+author:              Pablo Baeyens
+maintainer:
+category:            Personal
+build-type:          Simple
+cabal-version:       >=1.10
+
+executable mhP3
+  hs-source-dirs:      FUENTES
+  main-is:             Main.hs
+  other-modules:       Read,
+                       KNN,
+                       P1,
+                       Genetic,
+                       Memetic,
+                       ILS,
+                       DE,
+                       SA,
+                       Base,
+                       Utils
+  ghc-options:         -Wall -Wno-incomplete-patterns -Wno-missing-signatures -O2 -funbox-strict-fields -optc-O3 -optc-mfpmath=sse -fllvm   -funfolding-use-threshold=16 -fexcess-precision -optc-ffast-math
+  default-language:    Haskell2010
+  build-depends:       base >= 4.7 && < 5,
+                       text >= 1.2,
+                       vector >= 0.12,
+                       random >= 1.0,
+                       random-shuffle >= 0.0.4,
+                       directory >= 1.3,
+                       ListZipper == 1.2.0.2,
+                       clock >= 0.4,
+                       normaldistribution == 1.1.0.3,
+                       containers >= 0.5,
+                       mtl >= 2.2

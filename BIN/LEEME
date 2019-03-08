@@ -1,0 +1,15 @@
+
+Ejecución
+=========
+
+- El programa se ejecuta con `make run`.
+
+- El programa **asume que los saltos de línea son de tipo UNIX** (es decir, los finales de línea deben ser `\n` y no `\r\n`) y elimina datos duplicados de los ficheros de entrada.
+
+
+Modos de funcionamiento
+=======================
+
+1. Si no se pasa ningún argumento (`make run`) el programa ejecuta todos los algoritmos para todos los ficheros que estén en la carpeta `Data` con un generador de números aleatorio obtenido del sistema.
+2. Si se le pasa un único argumento lee un generador de ese argumento y ejecuta todos los algoritmos para todos los ficheros que estén en la carpeta `Data` con ese generador.
+3. Si se le pasa más de un argumento lee un generador del primer argumento y a continuación lee una lista de ficheros. Ejecuta todos los algoritmos sobre esos ficheros con el generador dado como argumento.
