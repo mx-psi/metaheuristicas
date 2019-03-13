@@ -27,8 +27,8 @@ type DEPopulation = V.Vector DESolution
 
 -- | Toma `n` elementos de `pop` distintos de `i`
 pickDistinctFrom :: DEPopulation -> Int -> Int -> Rand [DESolution]
-pickDistinctFrom pop i n = map (\k -> (pop V.! k)) <$> indices
-  where indices = (take n . (filter (/= i)) . nub) <$> randRs (0, V.length pop - 1)
+pickDistinctFrom pop i n = map (\k -> pop V.! k) <$> indices
+  where indices = (take n . filter (/= i) . nub) <$> randRs (0, V.length pop - 1)
 
 ----------------------------------
 -- |GESTIÓN DE BUCLE Y POBLACIÓN --

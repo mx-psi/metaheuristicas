@@ -61,7 +61,7 @@ rawEval ws ds = tasaClas (norm ws) ds + tasaRed ws
 
 -- | Mide el número de instancias clasificadas correctamente (precisión)
 tasaClas :: Weights -> DataSet -> Double
-tasaClas ws ds = leave1Out ws (getData ds)//(getSize ds)
+tasaClas ws ds = leave1Out ws (getData ds)//getSize ds
 
 -- | Calculates number of correctly classified instances
 leave1Out :: Weights -> Examples -> Int

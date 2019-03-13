@@ -30,8 +30,8 @@ getT0 s = mu*(50*getEval s)/(- log phi)
   where mu  = 0.3 :: Double
         phi = 0.3 :: Double
 
-maxNeighbors s = 5*(U.length (getV s)) -- max vecinos
-maxSuccess   s = (maxNeighbors s) `quot` 10
+maxNeighbors s = 5*U.length (getV s) -- max vecinos
+maxSuccess   s = maxNeighbors s `quot` 10
 
 getBeta :: Solution -> Double -> Double
 getBeta s t0 = (t0 - tf)/((15000/ fromIntegral (maxNeighbors s))*t0*tf)
@@ -48,23 +48,27 @@ initial s = SA {getSol = s, getBest = s, getK = 0,
 
 -- Cools temperature and increases number of coolings
 cool :: SAData -> SAData
-cool (SA {getSol = cur, getBest = best, getK = k, getT = cT, nSuccess = cS, nNeighbors = n, beta = b}) =
-  SA {getSol = cur, getBest = best, getK = k+1, getT = coolT b cT, nSuccess = cS, nNeighbors = n, beta = b}
+cool saData@(SA {getK = k, getT = cT, beta = b}) = saData {
+  getK = k+1,
+  getT = coolT b cT}
   where coolT betaC t = 0.95*t --t/(1 + betaC*t)
 
 -- Updates current solution. Updates best if better. Increases number of sucesses
 setCur :: Solution -> SAData -> SAData
-setCur s (SA {getSol = _, getBest = best, getK = k, getT = cT, nSuccess = cS, nNeighbors = n, beta = b}) =
-  SA {getSol = s, getBest = max s best, getK = k, getT = cT, nSuccess = cS + 1, nNeighbors = n + 1, beta = b}
+setCur s saData@(SA {getBest = best, nSuccess = cS, nNeighbors = n}) = saData {
+  getSol = s,
+  getBest = max s best,
+  nSuccess = cS + 1,
+  nNeighbors = n + 1}
 
 inc :: SAData -> SAData
-inc (SA {getSol = s, getBest = best, getK = k, getT = cT, nSuccess = cS, nNeighbors = n, beta = b}) =
-     SA {getSol = s, getBest = best, getK = k, getT = cT, nSuccess = cS, nNeighbors = n+1, beta = b}
+inc saData@(SA {nNeighbors = n}) = saData {nNeighbors = n+1}
 
 -- Reset number of succeses and Neighbors
 resetC :: SAData -> SAData
-resetC (SA {getSol = cur, getBest = best, getK = k, getT = cT, nSuccess = _, nNeighbors = _, beta = b}) =
-  SA {getSol = cur, getBest = best, getK = k, getT = cT, nSuccess = 0, nNeighbors = 0, beta = b}
+resetC saData = saData {
+  nSuccess = 0,
+  nNeighbors = 0}
 
 
 -------------------------

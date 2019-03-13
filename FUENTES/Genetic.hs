@@ -106,7 +106,7 @@ generBLXStep ds pop = do
   mutPop   <- (nMut `timesM` mutGener) (S.fromList $ children ++ unchanged)
   finalPop <- buildPop ds mutPop
   return (S.deleteMin $ S.insert best finalPop)
-  where nMut   = (S.size pop)*(nFeats ds) `quot` 1000
+  where nMut   = S.size pop*nFeats ds `quot` 1000
         nCross = floor (fromIntegral (S.size pop)*0.7) `quot` 2
         best = S.findMax pop
 
@@ -116,12 +116,12 @@ crossAr ss = map (Sol (-1) 0) [arith p1 p2, arith p2 p3, arith p3 p4, arith p4 p
 
 generArStep ds pop = do
   children  <- concat <$> replicateM nCross (crossAr <$> replicateM 4 (duel pop))
-  unchanged <- replicateM ((S.size pop) - nCross*4) (duel pop)
+  unchanged <- replicateM (S.size pop - nCross*4) (duel pop)
 
   mutPop   <- (nMut `timesM` mutGener) (S.fromList $ children ++ unchanged)
   finalPop <- buildPop ds mutPop
   return (S.deleteMin $ S.insert best finalPop)
-  where nMut   = (S.size pop)*(nFeats ds) `quot` 1000
+  where nMut   = S.size pop*nFeats ds `quot` 1000
         nCross = floor (fromIntegral (S.size pop)*0.7) `quot` 4
         best = S.findMax pop
 
@@ -131,6 +131,6 @@ generArStepMemetic ds pop = do
   mutPop   <- (nMut `timesM` mutGener) (S.fromList $ children ++ unchanged)
   finalPop <- buildPop ds mutPop
   return (S.deleteMin $ S.insert best finalPop)
-  where nMut   = (S.size pop)*(nFeats ds) `quot` 100
+  where nMut   = S.size pop*nFeats ds `quot` 100
         nCross = 2
         best = S.findMax pop

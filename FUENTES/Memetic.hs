@@ -28,7 +28,7 @@ iterAlgo step g ds = getBest g $ untilM (\_ -> (> 15000) <$> gets snd) (step ds)
 memAll, memRand, memMej :: DataSet -> (Int, Population) -> Rand (Int,Population)
 
 memeticAll = iterAlgo memAll
-memAll ds (!n,pop) = ((,) (n+1)) <$>
+memAll ds (!n,pop) = (,) (n+1) <$>
   if n `mod` 11 == 0
   then S.fromList <$> mapM (memeticLocal ds) (S.toList pop)
   else generArStepMemetic ds pop
@@ -39,13 +39,13 @@ localProb ds x = do
   if p < 0.1 then memeticLocal ds x else return x
 
 memeticRand = iterAlgo memRand
-memRand ds (!n,pop) = ((,) (n+1)) <$>
+memRand ds (!n,pop) = (,) (n+1) <$>
   if n `mod` 11 == 0
   then S.fromList <$> mapM (localProb ds) (S.toList pop)
   else generArStepMemetic ds pop
 
 memeticMej = iterAlgo memMej
-memMej ds (!n,pop) = ((,) (n+1)) <$>
+memMej ds (!n,pop) = (,) (n+1) <$>
   if n `mod` 11 == 0
   then (do
          let (m,pop') = S.deleteFindMax pop
