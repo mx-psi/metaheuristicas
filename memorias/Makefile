@@ -13,6 +13,7 @@ all: filters/pandoc-crossref $(PDFS)
 filters/pandoc-crossref:
 	wget https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.0.1/linux-ghc82-pandoc20.tar.gz
 	tar -xzf linux-ghc82-pandoc20.tar.gz
+	mkdir filters
 	cp pandoc-crossref filters/pandoc-crossref
 	rm pandoc-crossref linux-ghc82-pandoc20.tar.gz pandoc-crossref.1
 
