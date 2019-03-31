@@ -22,17 +22,21 @@ main :: IO ()
 main = do
   args <- getArgs
 
-  if length args <= 1 then (do
-    putStrLn "Ejecutando en todos los datasets disponibles"
-    ds <- fmap (map ("Data/"++)) (listDirectory "Data")
-    if null args then (do
-      g <- getStdGen
-      putStrLn $ "Usando el generador: \"" ++ show g ++ "\"\n"
-      forM_ ds (testDataSet g))
-    else
-      forM_ ds (testDataSet (read $ head args)))
-  else
-    forM_ (tail args) (testDataSet (read $ head args))
+  if length args <= 1
+    then
+      ( do
+        putStrLn "Ejecutando en todos los datasets disponibles"
+        ds <- fmap (map ("Data/" ++)) (listDirectory "Data")
+        if null args
+          then
+            ( do
+              g <- getStdGen
+              putStrLn $ "Usando el generador: \"" ++ show g ++ "\"\n"
+              forM_ ds (testDataSet g)
+            )
+          else forM_ ds (testDataSet (read $ head args))
+      )
+    else forM_ (tail args) (testDataSet (read $ head args))
 
 testDataSet :: StdGen -> FilePath -> IO ()
 testDataSet g file = do
@@ -48,26 +52,29 @@ stats chunks (name, algo) = do
   putStrLn "  Prec, Simpl,  Aggr, Tiempo"
   sequence_ evChunks
 
-printEv :: (Double,Double) -> IO ()
-printEv (p,s) = printf "%6.2f,%6.2f,%6.2f" p s (alpha*p + (1-alpha)*s)
+printEv :: (Double, Double) -> IO ()
+printEv (p, s) = printf "%6.2f,%6.2f,%6.2f" p s (alpha * p + (1 - alpha) * s)
   where alpha = 0.5
 
 chunkStats :: Algorithm -> Zipper DataSet -> [IO ()] -> [IO ()]
-chunkStats algo z xs = (do
-    let rest = concatMap getData $ toList $ delete z
-    let ws = algo (length rest, rest)
-    t1 <- getTime Monotonic
-    printEv (eval ws rest (getData $ cursor z))
-    t2 <- getTime Monotonic
-    let diff = fromIntegral (toNanoSecs (t2 - t1))*10**(-9 :: Double)
-    printf ",%7.4f\n" diff):xs
+chunkStats algo z xs =
+  ( do
+      let rest = concatMap getData $ toList $ delete z
+      let ws   = algo (length rest, rest)
+      t1 <- getTime Monotonic
+      printEv (eval ws rest (getData $ cursor z))
+      t2 <- getTime Monotonic
+      let diff = fromIntegral (toNanoSecs (t2 - t1)) * 10 ** (-9 :: Double)
+      printf ",%7.4f\n" diff
+    )
+    : xs
 
 
 -- | @cv gen n ps@ Splits 'ps' into 'n' fair subsets for cross-validation
 cv :: StdGen -> Int -> Examples -> [DataSet]
 cv gen n ps = shuf $ foldr1 (zipWith (++)) $ map (splitGroups n) shuffled
-  where
-    shuf   = map (\chunk -> (length chunk, shuffle' chunk (length chunk) gen))
-    groups = groupWith getClass ps -- points grouped by class :: Examples
-    lengths  = map length groups
-    shuffled = zipWith (\l g -> shuffle' g l gen) lengths groups
+ where
+  shuf     = map (\chunk -> (length chunk, shuffle' chunk (length chunk) gen))
+  groups   = groupWith getClass ps -- points grouped by class :: Examples
+  lengths  = map length groups
+  shuffled = zipWith (\l g -> shuffle' g l gen) lengths groups

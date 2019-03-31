@@ -25,7 +25,8 @@ classW !ws !ds !p = getClass neighbor
 
 -- | Calculates weighted Euclidean distance between two vectors
 distW :: Weights -> Point -> Point -> Double
-distW !ws !xs !ys = U.sum $ U.zipWith3 (\w x y -> w*(x-y)^(2::Int)) ws xs ys
+distW !ws !xs !ys =
+  U.sum $ U.zipWith3 (\w x y -> w * (x - y) ^ (2 :: Int)) ws xs ys
 
 -- | Discards < 0.2 coordinates
 norm :: Weights -> Weights
@@ -37,14 +38,16 @@ norm = U.map (\x -> if x < 0.2 then 0 else x)
 -------------------------------
 
 -- | Función de evaluación completa
-eval :: Weights -> Examples -> Examples -> (Double,Double)
-eval ws training test = (100*precCross (norm ws) training test, 100*tasaRed ws)
+eval :: Weights -> Examples -> Examples -> (Double, Double)
+eval ws training test =
+  (100 * precCross (norm ws) training test, 100 * tasaRed ws)
 
 -- | Calculates number of correctly classified instances
 -- It uses
 precCross :: Weights -> Examples -> Examples -> Double
-precCross ws training test = foldr infer 0 test//length test
-  where infer a !acc =  acc + fromEnum (classW ws training (getFeats a) == getClass a)
+precCross ws training test = foldr infer 0 test // length test
+ where
+  infer a !acc = acc + fromEnum (classW ws training (getFeats a) == getClass a)
 
 
 --------------------------------
@@ -61,17 +64,20 @@ rawEval ws ds = tasaClas (norm ws) ds + tasaRed ws
 
 -- | Mide el número de instancias clasificadas correctamente (precisión)
 tasaClas :: Weights -> DataSet -> Double
-tasaClas ws ds = leave1Out ws (getData ds)//getSize ds
+tasaClas ws ds = leave1Out ws (getData ds) // getSize ds
 
 -- | Calculates number of correctly classified instances
 leave1Out :: Weights -> Examples -> Int
 leave1Out ws ds = foldrz infer 0 (fromList ds)
-  where infer z !acc = let a = cursor z in
-          acc + fromEnum (classW ws (rest z) (getFeats a) == getClass a)
-        rest z = let (Zip as bs) = delete z in as ++ bs
+ where
+  infer z !acc =
+    let a = cursor z
+    in  acc + fromEnum (classW ws (rest z) (getFeats a) == getClass a)
+  rest z = let (Zip as bs) = delete z in as ++ bs
 
 -- | Porcentaje de características descartadas (simplicidad)
 tasaRed :: Weights -> Double
-tasaRed ws = m//n
-  where m = U.foldr' (\w acc -> acc + fromEnum (w < 0.2)) 0 ws
-        n = U.length ws
+tasaRed ws = m // n
+ where
+  m = U.foldr' (\w acc -> acc + fromEnum (w < 0.2)) 0 ws
+  n = U.length ws

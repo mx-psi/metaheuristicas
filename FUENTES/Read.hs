@@ -17,17 +17,17 @@ import Base
 -- Raises error if Text is not a Feature
 readFeat :: T.Text -> Feature
 readFeat x = case TR.rational x of
-              Right (d,"") -> d
-              Right (_,xs) -> error ("[readFeat] Didn't expect: " ++ show xs)
-              Left msg -> error msg
+  Right (d, "") -> d
+  Right (_, xs) -> error ("[readFeat] Didn't expect: " ++ show xs)
+  Left  msg     -> error msg
 
 -- | Reads a Class from a Text
 -- Raises error if Text is not a Class
 readClass :: T.Text -> Class
 readClass x = case TR.decimal x of
-              Right (d,"") -> d
-              Right (_,xs) -> error ("[readClass] Didn't expect: " ++ show xs)
-              Left msg -> error msg
+  Right (d, "") -> d
+  Right (_, xs) -> error ("[readClass] Didn't expect: " ++ show xs)
+  Left  msg     -> error msg
 
 -- | Gets an ARFF Example from Text
 -- Last coordinate is asumed to be the class
@@ -45,9 +45,10 @@ getExamples text = map readExample rawExamples
 -- $x_j^N = \frac{x_j - \min_j}{\max_j - \min_j}$
 normalize :: Examples -> Examples
 normalize ps = map norm ps
-  where maxv = foldr1 (U.zipWith max) $ map getFeats ps
-        minv = foldr1 (U.zipWith min) $ map getFeats ps
-        norm (x,c) = (U.zipWith3 (\h l e -> (e - l)/(h-l)) maxv minv x, c)
+ where
+  maxv = foldr1 (U.zipWith max) $ map getFeats ps
+  minv = foldr1 (U.zipWith min) $ map getFeats ps
+  norm (x, c) = (U.zipWith3 (\h l e -> (e - l) / (h - l)) maxv minv x, c)
 
 -- | Reads and normalizes Examples from an ARFF formatted file
 readExamples :: FilePath -> IO Examples

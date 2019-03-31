@@ -35,7 +35,7 @@ type Rand a = State (StdGen,Int) a
 ---------------------------
 
 addEval :: Int -> Rand ()
-addEval n = modify (fmap (+n))
+addEval n = modify (fmap (+ n))
 
 reset :: Rand ()
 reset = modify (fmap (const 0))
@@ -48,26 +48,26 @@ sol :: DataSet -> Weights -> Rand Solution
 sol ds v = do
   incEval
   n <- gets snd
-  return (Sol (rawEval v ds) n v)
+  pure (Sol (rawEval v ds) n v)
 
 ----------------------
 -- RANDOM FUNCTIONS --
 ----------------------
 
-toRandC :: (StdGen -> (a,StdGen)) -> Rand a
-toRandC r = state $ \(g,n) -> let (a,g') = r g in (a,(g',n))
+toRandC :: (StdGen -> (a, StdGen)) -> Rand a
+toRandC r = state $ \(g, n) -> let (a, g') = r g in (a, (g', n))
 
 -- | Generate random value within bounds
-randR :: (Random a) => (a,a) -> Rand a
+randR :: (Random a) => (a, a) -> Rand a
 randR = toRandC . randomR
 
-randRs :: (Random a) => (a,a) -> Rand [a]
-randRs (a,b) = do
-    g' <- splitS
-    return $ randomRs (a,b) g'
+randRs :: (Random a) => (a, a) -> Rand [a]
+randRs (a, b) = do
+  g' <- splitS
+  pure $ randomRs (a, b) g'
 
 chooseR :: Double -> Rand Bool
-chooseR thr = (< thr) <$> (randR (0,1) :: Rand Double)
+chooseR thr = (< thr) <$> (randR (0, 1) :: Rand Double)
 
 splitS = toRandC split
 
@@ -75,7 +75,7 @@ splitS = toRandC split
 randWeights :: DataSet -> Rand Weights
 randWeights ds = U.fromList <$> do
   g' <- splitS
-  return $ take (nFeats ds) (randomRs (0,1) g')
+  pure $ take (nFeats ds) (randomRs (0, 1) g')
 
 randNormal :: Rand Double
 randNormal = toRandC normal
@@ -85,7 +85,7 @@ randNormal = toRandC normal
 -------------------------------
 
 getWs :: StdGen -> Rand Solution -> Weights
-getWs g s = getV $ evalState s (g,0)
+getWs g s = getV $ evalState s (g, 0)
 
 randSol :: DataSet -> Rand Solution
 randSol ds = do
@@ -95,12 +95,13 @@ randSol ds = do
 -- Repeat until a condition is fulfilled
 untilM :: Monad m => (a -> m Bool) -> (a -> m a) -> m a -> m a
 untilM p f = goM
-  where goM m = do
-          x <- m
-          b <- p x
-          if b then m else goM (f x)
+ where
+  goM m = do
+    x <- m
+    b <- p x
+    if b then m else goM (f x)
 
-timesM n f = foldr (>=>) return (replicate n f)
+timesM n f = foldr (>=>) pure (replicate n f)
 
 --------------------
 -- List utilities --
@@ -112,12 +113,11 @@ timesM n f = foldr (>=>) return (replicate n f)
 -- | Evenly divides 'xs' in 'n' groups
 splitGroups :: Int -> [a] -> [[a]]
 splitGroups n xs = splitGroups' xs
-  where
-    m = ceiling $ length xs//n
-    splitGroups' [] = []
-    splitGroups' ys
-      | length ys < m = [ys]
-      | otherwise     = take m ys : splitGroups' (drop m ys)
+ where
+  m = ceiling $ length xs // n
+  splitGroups' [] = []
+  splitGroups' ys | length ys < m = [ys]
+                  | otherwise     = take m ys : splitGroups' (drop m ys)
 
 
 ---------------------
@@ -125,7 +125,7 @@ splitGroups n xs = splitGroups' xs
 ---------------------
 
 both :: (a -> b) -> (a, a) -> (b, b)
-both f (x,y) = (f x, f y)
+both f (x, y) = (f x, f y)
 
-(+:+) :: Num a => (a,a) -> (a,a) -> (a,a)
-(a,b) +:+ (c,d) = (a+c, b+d)
+(+:+) :: Num a => (a, a) -> (a, a) -> (a, a)
+(a, b) +:+ (c, d) = (a + c, b + d)
