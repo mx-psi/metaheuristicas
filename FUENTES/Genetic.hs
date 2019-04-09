@@ -70,7 +70,7 @@ blx = U.zipWithM cr
  where
   cr x y =
     let i = abs (x - y)
-    in  (max 0 . min 1) <$> randR (min x y - i * alpha, max x y + i * alpha)
+    in  max 0 . min 1 <$> randR (min x y - i * alpha, max x y + i * alpha)
   alpha = 0.3
 
 -- Estacionario BLX

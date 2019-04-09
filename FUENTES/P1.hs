@@ -108,13 +108,13 @@ local g ds = getWs g $ untilM
   ------------------------------------------------------
 
 memeticLocal :: DataSet -> Solution -> Rand Solution
-memeticLocal ds s = untilM (\_ -> (> 2 * numFeats) <$> cur)
-                           (localStep ds)
-                           (pure s)
-  where numFeats = nFeats ds
+memeticLocal ds = untilM stopCond (localStep ds) . pure
+ where
+  stopCond _ = (> 2 * numFeats) <$> cur
+  numFeats = nFeats ds
 
 localIls :: DataSet -> Solution -> Rand Solution
-localIls ds s = untilM (\c -> (> min 1000 (getN c + 20 * numFeats)) <$> cur)
-                       (localStep ds)
-                       (pure s)
-  where numFeats = nFeats ds
+localIls ds = untilM stopCond (localStep ds) . pure
+ where
+  stopCond c = (> min 1000 (getN c + 20 * numFeats)) <$> cur
+  numFeats = nFeats ds

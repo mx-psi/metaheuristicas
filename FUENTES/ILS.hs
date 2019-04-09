@@ -12,7 +12,7 @@ ils :: StdGen -> Algorithm
 ils g ds = getWs g $ (randSol ds >>= localIls ds) >>= (14 `timesM` ilsStep ds)
 
 pickFeats :: Weights -> Int -> Rand [Int]
-pickFeats ws n = (take n . nub) <$> randRs (0, U.length ws - 1)
+pickFeats ws n = take n . nub <$> randRs (0, U.length ws - 1)
 
 -- | Vecino de un vector de pesos en ILS
 vecinoILS :: Weights -> Int -> Rand Weights

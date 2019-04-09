@@ -62,9 +62,7 @@ randR :: (Random a) => (a, a) -> Rand a
 randR = toRandC . randomR
 
 randRs :: (Random a) => (a, a) -> Rand [a]
-randRs (a, b) = do
-  g' <- splitS
-  pure $ randomRs (a, b) g'
+randRs (a, b) = randomRs (a, b) <$> splitS
 
 chooseR :: Double -> Rand Bool
 chooseR thr = (< thr) <$> (randR (0, 1) :: Rand Double)
@@ -73,9 +71,7 @@ splitS = toRandC split
 
 -- | Generate random weights for a given dataset
 randWeights :: DataSet -> Rand Weights
-randWeights ds = U.fromList <$> do
-  g' <- splitS
-  pure $ take (nFeats ds) (randomRs (0, 1) g')
+randWeights ds = U.fromList <$> (take (nFeats ds) . randomRs (0, 1) <$> splitS)
 
 randNormal :: Rand Double
 randNormal = toRandC normal
